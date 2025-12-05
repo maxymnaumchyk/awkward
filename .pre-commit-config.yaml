@@ -1,0 +1,82 @@
+ci:
+  autoupdate_commit_msg: "chore: update pre-commit hooks"
+  autofix_commit_msg: "style: pre-commit fixes"
+  autoupdate_schedule: monthly
+
+exclude: ^(docs|studies|tests/samples|src/awkward/_typeparser/generated_parser.py)
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v6.0.0
+  hooks:
+  - id: check-added-large-files
+  - id: check-case-conflict
+  - id: check-merge-conflict
+  - id: check-symlinks
+  - id: check-yaml
+  - id: end-of-file-fixer
+    exclude_types: [svg]
+  - id: mixed-line-ending
+  - id: requirements-txt-fixer
+  - id: trailing-whitespace
+  - id: name-tests-test
+    args: ["--pytest-test-first"]
+
+- repo: https://github.com/cheshirekow/cmake-format-precommit
+  rev: v0.6.13
+  hooks:
+  - id: cmake-format
+    additional_dependencies: [pyyaml]
+
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.14.7
+  hooks:
+  - id: ruff-check
+    args: ["--fix", "--show-fixes"]
+  - id: ruff-format
+
+- repo: https://github.com/codespell-project/codespell
+  rev: v2.4.1
+  hooks:
+  - id: codespell
+    args: ["-L", "ue,subjet,parms,fo,numer,thre,nin,nout"]
+
+- repo: local
+  hooks:
+  - id: disallow-caps
+    name: disallow improper capitalization
+    language: pygrep
+    entry: PyBind|Cmake|CCache|Github|PyTest
+    exclude: .pre-commit-config.yaml
+
+- repo: https://github.com/shellcheck-py/shellcheck-py
+  rev: "v0.11.0.1"
+  hooks:
+  - id: shellcheck
+
+- repo: local
+  hooks:
+  - id: require-test-name-identifier
+    name: require identifiers for test names
+    language: python
+    entry: python dev/validate-test-names.py
+    types: [file, python]
+    files: ^tests/
+
+- repo: https://github.com/python-jsonschema/check-jsonschema
+  rev: 0.35.0
+  hooks:
+    - id: check-github-workflows
+      args: ["--verbose"]
+
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: v1.19.0
+  hooks:
+    - id: mypy
+      files: src
+      additional_dependencies:
+        - numpy>=1.24
+
+- repo: https://github.com/abravalheri/validate-pyproject
+  rev: v0.24.1
+  hooks:
+    - id: validate-pyproject
